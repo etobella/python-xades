@@ -2,10 +2,9 @@ import unittest
 from os import path
 
 import xmlsig
-from base import BASE_DIR, parse_xml
+from .base import BASE_DIR, parse_xml
 from xades import XAdESContext, PolicyId, template
 from OpenSSL import crypto
-from lxml import etree
 
 
 class TestXadesSignature(unittest.TestCase):
