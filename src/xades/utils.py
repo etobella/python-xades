@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# © 2017 Creu Blanca
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+
 def dict_compare(d1, d2):
     assert len(d1) == len(d2)
     d1_keys = set(d1.keys())

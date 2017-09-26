@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# © 2017 Creu Blanca
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
 from cryptography.hazmat.primitives import hashes
 
 from xmlsig import constants

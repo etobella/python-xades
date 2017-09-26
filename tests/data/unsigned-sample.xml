@@ -1,28 +1,67 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?><Facturae xmlns="http://www.facturae.es/Facturae/2007/v3.1/Facturae" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><FileHeader xmlns=""><SchemaVersion>3.1</SchemaVersion><Modality>I</Modality><InvoiceIssuerType>EM</InvoiceIssuerType><Batch><BatchIdentifier>2008/15501</BatchIdentifier><InvoicesCount>1</InvoicesCount><TotalInvoicesAmount><TotalAmount>127.01</TotalAmount></TotalInvoicesAmount><TotalOutstandingAmount><TotalAmount>127.01</TotalAmount></TotalOutstandingAmount><TotalExecutableAmount><TotalAmount>127.01</TotalAmount></TotalExecutableAmount><InvoiceCurrencyCode>EUR</InvoiceCurrencyCode></Batch></FileHeader><Parties xmlns=""><SellerParty><TaxIdentification><PersonTypeCode>J</PersonTypeCode><ResidenceTypeCode>R</ResidenceTypeCode><TaxIdentificationNumber>b99999999</TaxIdentificationNumber></TaxIdentification><LegalEntity><CorporateName>PRUEBAS, sl.</CorporateName><TradeName>PRUEBAS, sl.</TradeName><RegistrationData><Book>Libro</Book><RegisterOfCompaniesLocation>Registro</RegisterOfCompaniesLocation><Sheet>Hoja</Sheet><Folio>Folio</Folio><Section>Seccion</Section><Volume>Tomo</Volume><AdditionalRegistrationData>Otros</AdditionalRegistrationData></RegistrationData><AddressInSpain><Address>c/direccion</Address><PostCode>50320</PostCode><Town>Zaragoza</Town><Province>Zaragoza</Province><CountryCode>ESP</CountryCode></AddressInSpain><ContactDetails/></LegalEntity></SellerParty><BuyerParty><TaxIdentification><PersonTypeCode>J</PersonTypeCode><ResidenceTypeCode>R</ResidenceTypeCode><TaxIdentificationNumber>Q-2222222-I</TaxIdentificationNumber></TaxIdentification><LegalEntity><CorporateName>EMPRESA CLIENTE</CorporateName><TradeName>EMPRESA CLIENTE</TradeName><RegistrationData><Book/><RegisterOfCompaniesLocation/><Sheet/><Folio/><Section/><Volume/><AdditionalRegistrationData/></RegistrationData><AddressInSpain><Address>PASEO DE PRUENAS, 2</Address><PostCode>50009</PostCode><Town>ZARAGOZA</Town><Province>ZARAGOZA</Province><CountryCode>ESP</CountryCode></AddressInSpain><ContactDetails/></LegalEntity></BuyerParty></Parties><Invoices xmlns=""><Invoice><InvoiceHeader><InvoiceNumber>2008/155</InvoiceNumber><InvoiceSeriesCode>01</InvoiceSeriesCode><InvoiceDocumentType>FC</InvoiceDocumentType><InvoiceClass>OO</InvoiceClass></InvoiceHeader><InvoiceIssueData><IssueDate>2008-08-04</IssueDate><PlaceOfIssue><PostCode>50320</PostCode><PlaceOfIssueDescription>Zaragoza</PlaceOfIssueDescription></PlaceOfIssue><InvoiceCurrencyCode>EUR</InvoiceCurrencyCode><TaxCurrencyCode>EUR</TaxCurrencyCode><LanguageName>es</LanguageName></InvoiceIssueData><TaxesOutputs><Tax><TaxTypeCode>01</TaxTypeCode><TaxRate>16.00</TaxRate><TaxableBase><TotalAmount>109.49</TotalAmount></TaxableBase><TaxAmount><TotalAmount>17.52</TotalAmount></TaxAmount></Tax></TaxesOutputs><InvoiceTotals><TotalGrossAmount>109.49</TotalGrossAmount><GeneralDiscounts><Discount><DiscountReason>Descuento a cliente</DiscountReason><DiscountRate>0.0000</DiscountRate><DiscountAmount>0.00</DiscountAmount></Discount></GeneralDiscounts><TotalGrossAmountBeforeTaxes>109.49</TotalGrossAmountBeforeTaxes><TotalTaxOutputs>17.52</TotalTaxOutputs><TotalTaxesWithheld>0.00</TotalTaxesWithheld><InvoiceTotal>127.01</InvoiceTotal><TotalOutstandingAmount>127.01</TotalOutstandingAmount><TotalExecutableAmount>127.01</TotalExecutableAmount></InvoiceTotals><Items><InvoiceLine><IssuerTransactionReference/><ReceiverTransactionReference/><DeliveryNotesReferences><DeliveryNote><DeliveryNoteNumber>-0</DeliveryNoteNumber></DeliveryNote></DeliveryNotesReferences><ItemDescription>FACTURAS Y CERTIFICACIONES</ItemDescription><Quantity>1.00</Quantity><UnitPriceWithoutTax>109.490000</UnitPriceWithoutTax><TotalCost>109.49</TotalCost><DiscountsAndRebates><Discount><DiscountReason>Descuento a cliente</DiscountReason><DiscountRate>0.0000</DiscountRate><DiscountAmount>0.00</DiscountAmount></Discount></DiscountsAndRebates><GrossAmount>109.49</GrossAmount><TaxesOutputs><Tax><TaxTypeCode>01</TaxTypeCode><TaxRate>16.00</TaxRate><TaxableBase><TotalAmount>109.49</TotalAmount></TaxableBase><TaxAmount><TotalAmount>17.52</TotalAmount></TaxAmount></Tax></TaxesOutputs></InvoiceLine></Items><PaymentDetails><Installment><InstallmentDueDate>2008-11-02</InstallmentDueDate><InstallmentAmount>127.01</InstallmentAmount><PaymentMeans>05</PaymentMeans><AccountToBeDebited><IBAN>01234567890123456789</IBAN><BankCode>cajanorte</BankCode><BranchCode>66</BranchCode><BranchInSpainAddress><Address>c/las victorias, 3</Address><PostCode>50003</PostCode><Town>sepúlveda</Town><Province>zaragoza</Province><CountryCode>ESP</CountryCode></BranchInSpainAddress></AccountToBeDebited></Installment></PaymentDetails></Invoice></Invoices><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="Signature">
-<ds:SignedInfo Id="Signature-SignedInfo">
+<?xml version="1.0" encoding="UTF-8"?><collection Id="root">
+	<album>
+		<title>Questions, unanswered</title>
+		<artist>Steve and the flubberblubs</artist>
+		<year>1989</year>
+		<t:tracks xmlns:t="http://test.xades4j/tracks">
+			<t:song length="4:05" tracknumber="1">
+				<t:title>What do you know?</t:title>
+				<t:artist>Steve and the flubberblubs</t:artist>
+				<t:lastplayed>2006-10-17-08:31</t:lastplayed>
+			</t:song>
+			<t:song length="3:45" tracknumber="2">
+				<t:title>Who do you know?</t:title>
+				<t:artist>Steve and the flubberblubs</t:artist>
+				<t:lastplayed>2006-10-17-08:35</t:lastplayed>
+			</t:song>
+			<t:song length="5:14" tracknumber="3">
+				<t:title>When do you know?</t:title>
+				<t:artist>Steve and the flubberblubs</t:artist>
+				<t:lastplayed>2006-10-17-08:39</t:lastplayed>
+			</t:song>
+			<t:song length="4:19" tracknumber="4">
+				<t:title>Do you know?</t:title>
+				<t:artist>Steve and the flubberblubs</t:artist>
+				<t:lastplayed>2006-10-17-08:44</t:lastplayed>
+			</t:song>
+		</t:tracks>
+	</album>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d">
+<ds:SignedInfo>
 <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
-<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-<ds:Reference Id="SignedPropertiesID" Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature-SignedProperties">
-<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-<ds:DigestValue/>
-</ds:Reference>
-<ds:Reference URI="">
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<ds:Reference Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d-ref0" URI="#root">
 <ds:Transforms>
 <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
 </ds:Transforms>
-<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
 <ds:DigestValue/>
 </ds:Reference>
-<ds:Reference URI="#Certificate1">
-<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:Reference Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d-ref1" Type="http://www.w3.org/2000/09/xmldsig#Object" URI="#xmldsig-fc500d12-cea1-4b38-a728-83706950396d-object0">
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<ds:DigestValue/>
+</ds:Reference>
+<ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xmldsig-fc500d12-cea1-4b38-a728-83706950396d-signedprops">
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
 <ds:DigestValue/>
 </ds:Reference>
 </ds:SignedInfo>
-<ds:SignatureValue Id="SignatureValue"/>
-<ds:KeyInfo Id="Certificate1">
+<ds:SignatureValue Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d-sigvalue"/>
+<ds:KeyInfo>
 <ds:X509Data>
 <ds:X509Certificate/>
 </ds:X509Data>
-<ds:KeyValue/>
 </ds:KeyInfo>
-<ds:Object Id="Signature-Object"><xades:QualifyingProperties Target="#Signature"><xades:SignedProperties Id="Signature-SignedProperties"><xades:SignedSignatureProperties><xades:SigningTime>2010-02-11T17:28:24+01:00</xades:SigningTime><xades:SigningCertificate><xades:Cert><xades:CertDigest><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>6jWIOEVMTanvoO0o4Jl3x9xkcDU=</ds:DigestValue></xades:CertDigest><xades:IssuerSerial><ds:X509IssuerName>CN=AC DNIE 001,OU=DNIE,O=DIRECCION GENERAL DE LA POLICIA,C=ES</ds:X509IssuerName><ds:X509SerialNumber>77650501059047179808462143355025559049</ds:X509SerialNumber></xades:IssuerSerial></xades:Cert></xades:SigningCertificate><xades:SignaturePolicyIdentifier><xades:SignaturePolicyId><xades:SigPolicyId><xades:Identifier>http://www.facturae.es/politica_de_firma_formato_facturae/politica_de_firma_formato_facturae_v3_1.pdf</xades:Identifier><xades:Description>facturae31</xades:Description></xades:SigPolicyId><xades:SigPolicyHash><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>Ohixl6upD6av8N7pEvDABhEL6hM=</ds:DigestValue></xades:SigPolicyHash></xades:SignaturePolicyId></xades:SignaturePolicyIdentifier><xades:SignerRole><xades:ClaimedRoles><xades:ClaimedRole>emisor</xades:ClaimedRole></xades:ClaimedRoles></xades:SignerRole></xades:SignedSignatureProperties></xades:SignedProperties></xades:QualifyingProperties></ds:Object></ds:Signature></Facturae>
+<ds:Object Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d-object0" MimeType="text/xml"><data>11223344556677889900</data></ds:Object>
+<ds:Object>
+	<xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Target="#xmldsig-fc500d12-cea1-4b38-a728-83706950396d">
+		<xades:SignedProperties Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d-signedprops">
+			<xades:SignedSignatureProperties>
+				<xades:SigningTime/>
+				<xades:SigningCertificate/>
+				<xades:SignaturePolicyIdentifier/>
+			</xades:SignedSignatureProperties>
+		</xades:SignedProperties>
+	</xades:QualifyingProperties>
+</ds:Object>
+</ds:Signature></collection>
