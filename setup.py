@@ -3,7 +3,7 @@ import sys
 from setuptools import find_packages, setup
 
 install_requires = [
-    'xmlsig',
+    'git+https://github.com/etobella/python-xmlsig',
     'urllib',
     'pytz'
 ]
