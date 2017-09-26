@@ -19,7 +19,7 @@ retest:
 	py.test -vvv --lf
 
 coverage:
-	py.test --cov=xmlsig --cov-report=term-missing --cov-report=html
+	py.test --cov=xades --cov-report=term-missing --cov-report=html
 
 release:
 	pip install twine wheel
