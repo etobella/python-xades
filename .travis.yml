@@ -38,7 +38,6 @@ deps:
 
 install:
   - pip install tox codecov
-  - pip install git+https://github.com/etobella/python-xmlsig.git
 
 script:
   - tox -e $TOXENV
