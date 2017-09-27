@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives import hashes
 from xmlsig import constants
 from .ns import EtsiNS
 
+ID_ATTR = 'Id'
 NS_MAP = constants.NS_MAP
 NS_MAP['etsi'] = EtsiNS
 

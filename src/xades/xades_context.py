@@ -2,24 +2,30 @@
 # © 2017 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from datetime import datetime
 from os import path
 
+import pytz
 from lxml import etree
 
-from xmlsig import SignatureContext
-from .constants import NS_MAP, EtsiNS
-from datetime import datetime
-import pytz
+from xmlsig import SignatureContext, constants
+from .constants import NS_MAP
+from .policy import ImpliedPolicy
 
 
 class XAdESContext(SignatureContext):
-    def __init__(self, policy):
+    def __init__(self, policy=None):
         """
         Declaration
         :param policy: Policy class
         :type policy: xades.Policy
         """
         self.policy = policy
+        self.policies = {None: ImpliedPolicy()}
+        if policy is None:
+            self.policy = ImpliedPolicy()
+        else:
+            self.policies[policy.identifier] = policy
         super(XAdESContext, self).__init__()
 
     def sign(self, node):
@@ -38,11 +44,12 @@ class XAdESContext(SignatureContext):
         self.calculate_signed_properties(signed_properties, node, True)
         unsigned_properties = node.find(
             "ds:Object/etsi:QualifyingProperties["
-            "@Target='#{}']/etsi:UnSignedProperties".format(
+            "@Target='#{}']/etsi:UnsignedProperties".format(
                 node.get('Id')),
             namespaces=NS_MAP)
         if unsigned_properties is not None:
-            self.calculate_unsigned_properties(signed_properties, node, True)
+            self.calculate_unsigned_properties(unsigned_properties, node, True)
+        self.policy.sign(node)
         res = super(XAdESContext, self).sign(node)
         return res
 
@@ -71,6 +78,16 @@ class XAdESContext(SignatureContext):
             namespaces=NS_MAP)
         if unsigned_properties is not None:
             self.calculate_unsigned_properties(signed_properties, node, False)
+        policy_id = signed_properties.find(
+            'etsi:SignedSignatureProperties/etsi:SignaturePolicyIdentifier/'
+            'etsi:SignaturePolicyId/etsi:SigPolicyId/etsi:Identifier',
+            namespaces=NS_MAP
+        )
+        policy = self.policies[None]
+        if policy_id is not None:
+            if policy_id.text in self.policies:
+                policy = self.policies[policy_id.text]
+        policy.validate(node)
         res = super(XAdESContext, self).verify(node)
         return res
 
@@ -83,7 +100,7 @@ class XAdESContext(SignatureContext):
         data_object_properties = signed_properties.find(
             'etsi:SignedDataObjectProperties', namespaces=NS_MAP
         )
-        if signature_properties is None:
+        if data_object_properties is not None:
             self.calculate_data_object_properties(
                 data_object_properties, node, sign
             )
@@ -105,17 +122,34 @@ class XAdESContext(SignatureContext):
         )
         assert certificate_list is not None
         if sign:
-            self.policy.calculate_certificate(certificate_list, self.x509)
+            self.policy.calculate_certificates(certificate_list, self.x509)
         else:
             self.policy.validate_certificate(certificate_list, node)
         policy = signature_properties.find(
             'etsi:SignaturePolicyIdentifier', namespaces=NS_MAP
         )
-        assert policy is not None
+        if sign:
+            assert policy is not None
         self.policy.calculate_policy_node(policy, sign)
 
-    def calculate_data_object_properties(self, data_object_properties, node, sign=False):
+    def calculate_data_object_properties(
+            self, data_object_properties, node, sign=False):
+        """
+        To be improved with EPES, T...
+        :param data_object_properties: DataObjectProperties node
+        :param node: Signature node
+        :param sign: 
+        :return: 
+        """
         return
 
-    def calculate_unsigned_properties(self, unsigned_properties, node, sign=False):
+    def calculate_unsigned_properties(
+            self, unsigned_properties, node, sign=False):
+        """
+                To be improved with EPES, T...
+                :param unsigned_properties: UnsignedProperties node
+                :param node: Signature node
+                :param sign: 
+                :return: 
+                """
         return

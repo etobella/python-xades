@@ -12,7 +12,7 @@ include setup.cfg
 include setup.py
 
 graft src
-# graft tests
+# graft test
 
 global-exclude __pycache__
 global-exclude *.py[co]

@@ -2,6 +2,9 @@
 # © 2017 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from uuid import uuid4
+from .constants import ID_ATTR
+
 
 def dict_compare(d1, d2):
     assert len(d1) == len(d2)
@@ -15,3 +18,21 @@ def dict_compare(d1, d2):
 
 def rdns_to_map(data):
     return {x.split('=')[0]: x.split('=')[1] for x in data.split(',') if x}
+
+
+def get_unique_id():
+    return 'id-{0}'.format(uuid4())
+
+
+def ensure_id(node):
+    """Ensure given node has a wsu:Id attribute; add unique one if not.
+
+    Return found/created attribute value.
+
+    """
+    assert node is not None
+    id_val = node.get(ID_ATTR)
+    if not id_val:
+        id_val = get_unique_id()
+        node.set(ID_ATTR, id_val)
+    return id_val

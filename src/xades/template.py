@@ -2,7 +2,7 @@ from lxml import etree
 
 from xmlsig.constants import DSigNs
 from xmlsig.utils import create_node
-from .constants import NS_MAP, EtsiNS
+from .constants import NS_MAP, EtsiNS, ID_ATTR
 
 
 def create_qualifying_properties(node, name=None, etsi='etsi'):
@@ -12,16 +12,16 @@ def create_qualifying_properties(node, name=None, etsi='etsi'):
         etree.QName(EtsiNS, 'QualifyingProperties'),
         nsmap={etsi: EtsiNS}
     )
-    qualifying.set('Target', '#' + node.get('Id'))
+    qualifying.set('Target', '#' + node.get(ID_ATTR))
     if name is not None:
-        qualifying.set('Id', name)
+        qualifying.set(ID_ATTR, name)
     return qualifying
 
 
 def create_signed_properties(node, name=None, datetime=None):
     properties = create_node('SignedProperties', node, EtsiNS)
     if name is not None:
-        properties.set('Id', name)
+        properties.set(ID_ATTR, name)
     signature_properties = create_node(
         'SignedSignatureProperties', properties, EtsiNS
     )
