@@ -5,7 +5,7 @@ from os import path
 from OpenSSL import crypto
 
 import xmlsig
-from xades import XAdESContext, template, utils
+from xades import XAdESContext, template, utils, ObjectIdentifier
 from xades.policy import GenericPolicyId, ImpliedPolicy
 from .base import BASE_DIR, parse_xml
 
@@ -45,7 +45,7 @@ class TestXadesSignature(unittest.TestCase):
         )
         signature_id = utils.get_unique_id()
         ref = xmlsig.template.add_reference(
-            signature, xmlsig.constants.TransformSha1, uri=""
+            signature, xmlsig.constants.TransformSha1, uri="", name="REF"
         )
         xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
         xmlsig.template.add_reference(
@@ -93,11 +93,11 @@ class TestXadesSignature(unittest.TestCase):
             "Signature"
         )
         ref = xmlsig.template.add_reference(
-            signature, xmlsig.constants.TransformSha1, uri=""
+            signature, xmlsig.constants.TransformSha1, uri="", name="R1"
         )
         xmlsig.template.add_transform(ref, xmlsig.constants.TransformEnveloped)
         xmlsig.template.add_reference(
-            signature, xmlsig.constants.TransformSha1, uri="#KI"
+            signature, xmlsig.constants.TransformSha1, uri="#KI", name="RKI"
         )
         ki = xmlsig.template.ensure_key_info(signature, name='KI')
         data = xmlsig.template.add_x509_data(ki)
@@ -113,9 +113,35 @@ class TestXadesSignature(unittest.TestCase):
             qualifying, datetime=datetime.now()
         )
         template.add_claimed_role(props, "Supp")
+        signed_do = template.ensure_signed_data_object_properties(props)
+        template.add_data_object_format(
+            signed_do,
+            "#R1",
+            identifier=ObjectIdentifier("Idenfitier0", "Description")
+        )
+        template.add_commitment_type_indication(
+            signed_do,
+            ObjectIdentifier("Idenfitier0", "Description"),
+            qualifiers_type=["Tipo"]
+        )
+
+        template.add_commitment_type_indication(
+            signed_do,
+            ObjectIdentifier("Idenfitier1", references=["#R1"]),
+            references=["#R1"]
+        )
+        template.add_data_object_format(
+            signed_do,
+            "#RKI",
+            description="Desc",
+            mime_type="application/xml",
+            encoding='UTF-8'
+        )
         root.append(signature)
         ctx = XAdESContext(ImpliedPolicy(xmlsig.constants.TransformSha1))
         with open(path.join(BASE_DIR, "data/keyStore.p12"), "rb") as key_file:
             ctx.load_pkcs12(crypto.load_pkcs12(key_file.read()))
         ctx.sign(signature)
+        from lxml import etree
+        print(etree.tostring(root))
         ctx.verify(signature)

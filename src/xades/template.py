@@ -80,3 +80,61 @@ def add_claimed_role(node, role):
     claimed_role = create_node('ClaimedRole', claimed_roles, EtsiNS)
     claimed_role.text = role
     return claimed_role
+
+
+def ensure_signed_data_object_properties(node):
+    properties = node.find(
+        'etsi:SignedDataObjectProperties', namespaces=NS_MAP
+    )
+    if properties:
+        return properties
+    return create_node('SignedDataObjectProperties', node, EtsiNS)
+
+
+def add_data_object_format(node, reference, description=None,
+                           identifier=None, mime_type=None, encoding=None):
+    data_object_node = create_node('DataObjectFormat', ns=EtsiNS)
+    node.insert(
+        len(node.findall('etsi:DataObjectFormat', namespaces=NS_MAP)),
+        data_object_node
+    )
+    data_object_node.set("ObjectReference", reference)
+    if description is not None:
+        create_node('Description', data_object_node, EtsiNS).text = description
+    if identifier is not None:
+        identifier.to_xml(
+            create_node('ObjectIdentifier', data_object_node, EtsiNS)
+        )
+    if mime_type is not None:
+        create_node('MimeType', data_object_node, EtsiNS).text = mime_type
+    if encoding is not None:
+        create_node('Encoding', data_object_node, EtsiNS).text = encoding
+    return data_object_node
+
+
+def add_commitment_type_indication(
+        node, identifier, references=None, qualifiers_type=None
+):
+    commitment_type = create_node('CommitmentTypeIndication', ns=EtsiNS)
+    node.insert(
+        len(node.findall('etsi:DataObjectFormat', namespaces=NS_MAP)) +
+        len(node.findall('etsi:CommitmentTypeIndication', namespaces=NS_MAP))
+        ,
+        commitment_type
+    )
+    identifier.to_xml(create_node('CommitmentTypeId', commitment_type, EtsiNS))
+    if references is None:
+        create_node('AllSignedDataObjects', commitment_type, EtsiNS)
+    else:
+        for reference in references:
+            create_node(
+                'ObjectReference', commitment_type, EtsiNS
+            ).text = reference
+    if qualifiers_type is not None:
+        qualifiers = create_node(
+            'CommitmentTypeQualifiers', commitment_type, EtsiNS
+        )
+        for qualifier in qualifiers_type:
+            create_node(
+                'CommitmentTypeQualifier', qualifiers, EtsiNS
+            ).text = qualifier
