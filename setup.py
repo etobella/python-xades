@@ -25,7 +25,7 @@ tests_require = [
 
 setup(
     name='xades',
-    version='0.2.0',
+    version='0.2.1',
     description='XaDES XML signature',
     long_description='XaDES XML Signature created with cryptography and lxml',
     author="Enric Tobella Alomar",
@@ -49,11 +49,10 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python :: 3.7',
     ],
     zip_safe=False,
 )

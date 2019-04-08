@@ -18,5 +18,4 @@ MAP_HASHLIB = {
     constants.TransformSha256: hashes.SHA256,
     constants.TransformSha384: hashes.SHA384,
     constants.TransformSha512: hashes.SHA512,
-    constants.TransformRipemd160: hashes.RIPEMD160,
 }
