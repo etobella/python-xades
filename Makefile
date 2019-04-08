@@ -5,8 +5,8 @@ install:
 	pip install bumpversion twine wheel
 
 lint:
-	flake8 src/ tests/
-	isort --recursive --check-only --diff src tests
+	flake8 src/ test/
+	isort --recursive --check-only --diff src test
 
 clean:
 	find . -name '*.pyc' -delete

@@ -30,7 +30,7 @@
 <ds:SignedInfo>
 <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
 <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
-<ds:Reference Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d-ref0" URI="#root">
+<ds:Reference Id="xmldsig-fc500d12-cea1-4b38-a728-83706950396d-ref0" URI="#root" >
 <ds:Transforms>
 <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
 </ds:Transforms>
@@ -61,7 +61,12 @@
 				<xades:SigningCertificate/>
 				<xades:SignaturePolicyIdentifier/>
 			</xades:SignedSignatureProperties>
+			<xades:SignedDataObjectProperties>
+				<xades:DataObjectFormat ObjectReference="#xmldsig-fc500d12-cea1-4b38-a728-83706950396d-ref0"/>
+			</xades:SignedDataObjectProperties>
 		</xades:SignedProperties>
+		<xades:UnsignedProperties>
+		</xades:UnsignedProperties>
 	</xades:QualifyingProperties>
 </ds:Object>
 </ds:Signature></collection>
