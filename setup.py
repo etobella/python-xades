@@ -25,7 +25,7 @@ tests_require = [
 
 setup(
     name='xades',
-    version='0.1.0',
+    version='0.2.0',
     description='XaDES XML signature',
     long_description='XaDES XML Signature created with cryptography and lxml',
     author="Enric Tobella Alomar",
