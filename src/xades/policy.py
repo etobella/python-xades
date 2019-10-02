@@ -135,7 +135,7 @@ class Policy(object):
             TransformUsageDigestMethod[data['DigestMethodAlgorithm']])
         hash_calc.update(value)
         digest_val = hash_calc.digest()
-        assert data['DigestValue'].encode() == b64encode(digest_val)
+        assert data['DigestValue'] == b64encode(digest_val).decode()
 
     def calculate_certificates(self, node, key_x509):
         self.calculate_certificate(node, key_x509)
@@ -200,8 +200,8 @@ class Policy(object):
             assert b64encode(
                 parsed_x509.fingerprint(MAP_HASHLIB[digest.find(
                     'ds:DigestMethod', namespaces=NS_MAP
-                ).get('Algorithm')]())) == digest.find(
-                'ds:DigestValue', namespaces=NS_MAP).text.encode()
+                ).get('Algorithm')]())).decode() == digest.find(
+                'ds:DigestValue', namespaces=NS_MAP).text
 
     def calculate_policy_node(self, node, sign=False):
         """
@@ -287,7 +287,7 @@ class GenericPolicyId(Policy):
             ),
             ETSI.SigPolicyHash(
                 DS.DigestMethod(Algorithm=self.hash_method),
-                DS.DigestValue(b64encode(hash_calc.digest()))
+                DS.DigestValue(b64encode(hash_calc.digest()).decode())
             )
         )
         node.append(_ETSI_SignaturePolicyId)
@@ -308,5 +308,4 @@ class GenericPolicyId(Policy):
         hash_calc = hashlib.new(
             TransformUsageDigestMethod[data['DigestMethodAlgorithm']])
         hash_calc.update(value)
-        digest_val = hash_calc.digest()
-        assert data['DigestValue'].encode() == b64encode(digest_val)
+        assert data['DigestValue'] == b64encode(hash_calc.digest()).decode()
