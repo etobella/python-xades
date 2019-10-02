@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import hashlib
+import logging
 from base64 import b64decode, b64encode
 
 from cryptography.hazmat.backends import default_backend
@@ -20,6 +21,7 @@ if USING_PYTHON2:
 else:
     import urllib.request as urllib
 
+logger = logging.getLogger(__name__)
 
 class Policy(object):
     """"
@@ -34,6 +36,10 @@ class Policy(object):
     @property
     def name(self):
         raise Exception("Name is not defined")
+
+    @property
+    def policy(self):
+        raise Exception("Policy is not defined")
 
     def _resolve_policy(self, identifier):
         """
@@ -59,10 +65,12 @@ class Policy(object):
             'etsi:SignedSignatureProperties/etsi:SignaturePolicyIdentifier/'
             'etsi:SignaturePolicyId',
             namespaces=NS_MAP)
-        if policy is not None:
-            if self.identifier == policy.find(
-                    'etsi:SigPolicyId/etsi:Identifier', namespaces=NS_MAP):
-                self.validate_policy(signature)
+        if policy is None:
+            return
+        if self.identifier != policy.find(
+                'etsi:SigPolicyId/etsi:Identifier', namespaces=NS_MAP):
+            return
+        self.validate_policy(signature)
 
     def validate_policy(self, signature):
         """
@@ -72,7 +80,7 @@ class Policy(object):
         """
         return
 
-    def set_transforms(self, node, value, sign=False):
+    def set_transforms(self, transforms, value, sign=False):
         """
         Creates transformations of the policy if required. Modifies node and 
         returns the transformed value
@@ -83,27 +91,45 @@ class Policy(object):
         """
         return value
 
-    def calculate_policy_node(self, node, sign=False):
-        if sign:
-            raise Exception("Policy cannot be calculated on generic class")
-        implied = node.find('etsi:SignaturePolicyImplied', namespaces=NS_MAP)
-        if implied is not None:
-            return
+    def _query_signature_policy_identifer_data(self, node):
+        """
+        Query common policy validation data.
+        """
         signature_policy_id = node.find('etsi:SignaturePolicyId', namespaces=NS_MAP)
         sig_policy_id = signature_policy_id.find('etsi:SigPolicyId', namespaces=NS_MAP)
         identifier = sig_policy_id.find('etsi:Identifier', namespaces=NS_MAP).text
-        value = self._resolve_policy(identifier)
-        value = self.set_transforms(signature_policy_id, value, sign)
         hash_method = signature_policy_id.find(
             'etsi:SigPolicyHash/ds:DigestMethod', namespaces=NS_MAP
         ).get('Algorithm')
         digest_value = signature_policy_id.find(
             'etsi:SigPolicyHash/ds:DigestValue', namespaces=NS_MAP
-        )
-        hash_calc = hashlib.new(TransformUsageDigestMethod[hash_method])
+        ).text
+        transforms = signature_policy_id.find('ds:Tranforms', namespaces=NS_MAP)
+        return {
+            "Identifier": identifier,
+            "DigestMethodAlgorithm": hash_method,
+            "DigestValue": digest_value,
+            "Transforms": transforms
+        }
+
+    def validate_policy_node(self, node):
+        """
+        An unspecific validation implementation for a given
+        <etsi:SignaturePolicyIdentifier/> node
+        :param node: Policy node
+        :return: bool
+        """
+        implied = node.find('etsi:SignaturePolicyImplied', namespaces=NS_MAP)
+        if implied is not None:
+            return
+        data = self._query_signature_policy_identifer_data(node)
+        value = self._resolve_policy(data['Identifier'])
+        value = self.set_transforms(data['Transforms'], value, False)
+        hash_calc = hashlib.new(
+            TransformUsageDigestMethod[data['DigestMethodAlgorithm']])
         hash_calc.update(value)
         digest_val = hash_calc.digest()
-        assert digest_value.text.encode() == b64encode(digest_val)
+        assert data['DigestValue'].encode() == b64encode(digest_val)
 
     def calculate_certificates(self, node, key_x509):
         self.calculate_certificate(node, key_x509)
@@ -174,6 +200,20 @@ class Policy(object):
                 ).get('Algorithm')]())) == digest.find(
                 'ds:DigestValue', namespaces=NS_MAP).text.encode()
 
+    def calculate_policy_node(self, node, sign=False):
+        """
+        Calculates de policy node
+        :param node: SignaturePolicyIdentifier node
+        :param sign: checks if we must calculate or validate a policy
+        :return:
+        """
+        logger.warning(
+            "This method is deprecated. Use `produce_policy_node` "
+            "or `validate_policy_node` accordingly.")
+        if not sign:
+            return self.validate_policy_node(node)
+        return self.produce_policy_node(node)
+
 
 class ImpliedPolicy(Policy):
     def __init__(self, hash_method=TransformSha1):
@@ -183,28 +223,52 @@ class ImpliedPolicy(Policy):
     def identifier(self):
         return None
 
-    def calculate_policy_node(self, node, sign=False):
+    def produce_policy_node(self, node):
         """
-        Calculates de policy node
+        Produces the policy node
         :param node: SignaturePolicyIdentifier node
-        :param sign: checks if we must calculate or validate a policy
-        :return: 
+        :return:
         """
-        if not sign:
-            return super(ImpliedPolicy, self).calculate_policy_node(node, sign)
-        return create_node('SignaturePolicyImplied', node, EtsiNS)
+        create_node('SignaturePolicyImplied', node, EtsiNS)
+
+    def validate_policy_node(self, node):
+        """
+        A specific validation implementation for a given
+        <etsi:SignaturePolicyIdentifier/> node
+        Implied policy by itself cannot be validated
+        :param node: Policy node
+        :return:
+        """
+        return
 
 
-class PolicyId(Policy):
-    def calculate_policy_node(self, node, sign=False):
+class GenericPolicyId(Policy):
+    def __init__(self, identifier, name, hash_method):
+        self.generic_identifier = identifier
+        self.generic_name = name
+        self.hash_method = hash_method
+        self._policy = None
+
+    @property
+    def identifier(self):
+        return self.generic_identifier
+
+    @property
+    def name(self):
+        return self.generic_name
+
+    @property
+    def policy(self):
+        if not self._policy:
+            self._policy = self._resolve_policy(self.identifier)
+        return self._policy
+
+    def produce_policy_node(self, node):
         """
-        Calculates de policy node
+        Produces the policy node
         :param node: SignaturePolicyIdentifier node
-        :param sign: checks if we must calculate or validate a policy
-        :return: 
+        :return:
         """
-        if not sign:
-            return super(PolicyId, self).calculate_policy_node(node, sign)
         signature_policy_id = create_node('SignaturePolicyId', node, EtsiNS)
         sig_policy_id = create_node('SigPolicyId', signature_policy_id, EtsiNS)
         create_node('Identifier', sig_policy_id, EtsiNS).text = self.identifier
@@ -219,17 +283,21 @@ class PolicyId(Policy):
         hash_calc.update(value)
         digest_value.text = b64encode(hash_calc.digest())
 
-
-class GenericPolicyId(PolicyId):
-    def __init__(self, identifier, name, hash_method):
-        self.generic_identifier = identifier
-        self.generic_name = name
-        self.hash_method = hash_method
-
-    @property
-    def identifier(self):
-        return self.generic_identifier
-
-    @property
-    def name(self):
-        return self.generic_name
+    def validate_policy_node(self, node):
+        """
+        A specifc validation implementation for a given
+        <etsi:SignaturePolicyIdentifier/> node leveraging known cached policy
+        :param node: Policy node
+        :return: bool
+        """
+        implied = node.find('etsi:SignaturePolicyImplied', namespaces=NS_MAP)
+        if implied is not None:
+            return
+        data = self._query_signature_policy_identifer_data(node)
+        value = self.policy
+        value = self.set_transforms(data['Transforms'], value, False)
+        hash_calc = hashlib.new(
+            TransformUsageDigestMethod[data['DigestMethodAlgorithm']])
+        hash_calc.update(value)
+        digest_val = hash_calc.digest()
+        assert data['DigestValue'].encode() == b64encode(digest_val)
