@@ -3,11 +3,18 @@ from datetime import datetime
 from os import path
 
 from OpenSSL import crypto
-
+from mock import patch
 import xmlsig
 from xades import XAdESContext, template, utils, ObjectIdentifier
 from xades.policy import GenericPolicyId, ImpliedPolicy
 from .base import BASE_DIR, parse_xml
+
+
+class UrllibMock:
+    def read(self):
+        with open(path.join(BASE_DIR, 'data/policy.pdf'), 'rb') as f:
+            result = f.read()
+        return result
 
 
 class TestXadesSignature(unittest.TestCase):
@@ -17,7 +24,9 @@ class TestXadesSignature(unittest.TestCase):
             '//ds:Signature', namespaces={'ds': xmlsig.constants.DSigNs}
         )[0]
         ctx = XAdESContext()
-        ctx.verify(sign)
+        with patch('xades.policy.urllib.urlopen') as mock:
+            mock.return_value = UrllibMock()
+            ctx.verify(sign)
 
     def test_sign(self):
         root = parse_xml('data/unsigned-sample.xml')
@@ -33,8 +42,10 @@ class TestXadesSignature(unittest.TestCase):
         ctx = XAdESContext(policy)
         with open(path.join(BASE_DIR, "data/keyStore.p12"), "rb") as key_file:
             ctx.load_pkcs12(crypto.load_pkcs12(key_file.read()))
-        ctx.sign(sign)
-        ctx.verify(sign)
+        with patch('xades.policy.urllib.urlopen') as mock:
+            mock.return_value = UrllibMock()
+            ctx.sign(sign)
+            ctx.verify(sign)
 
     def test_create(self):
         root = parse_xml('data/free-sample.xml')
@@ -82,8 +93,10 @@ class TestXadesSignature(unittest.TestCase):
         ctx = XAdESContext(policy)
         with open(path.join(BASE_DIR, "data/keyStore.p12"), "rb") as key_file:
             ctx.load_pkcs12(crypto.load_pkcs12(key_file.read()))
-        ctx.sign(signature)
-        ctx.verify(signature)
+        with patch('xades.policy.urllib.urlopen') as mock:
+            mock.return_value = UrllibMock()
+            ctx.sign(signature)
+            ctx.verify(signature)
 
     def test_create_2(self):
         root = parse_xml('data/free-sample.xml')
@@ -141,7 +154,7 @@ class TestXadesSignature(unittest.TestCase):
         ctx = XAdESContext(ImpliedPolicy(xmlsig.constants.TransformSha1))
         with open(path.join(BASE_DIR, "data/keyStore.p12"), "rb") as key_file:
             ctx.load_pkcs12(crypto.load_pkcs12(key_file.read()))
-        ctx.sign(signature)
-        from lxml import etree
-        print(etree.tostring(root))
-        ctx.verify(signature)
+        with patch('xades.policy.urllib.urlopen') as mock:
+            mock.return_value = UrllibMock()
+            ctx.sign(signature)
+            ctx.verify(signature)

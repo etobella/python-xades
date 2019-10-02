@@ -15,9 +15,6 @@ matrix:
     - python: 2.7
       dist: trusty
       env: TOXENV=py27 LXML_VERSION=4.3.0
-    - python: 3.4
-      dist: trusty
-      env: TOXENV=py34 LXML_VERSION=4.3.0
     - python: 3.5
       dist: trusty
       env: TOXENV=py35 LXML_VERSION=4.3.0
