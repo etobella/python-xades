@@ -8,6 +8,7 @@ from base64 import b64decode, b64encode
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_der_x509_certificate
+from lxml.builder import ElementMaker
 
 from xades.constants import NS_MAP, MAP_HASHLIB
 from xades.ns import EtsiNS
@@ -22,6 +23,11 @@ else:
     import urllib.request as urllib
 
 logger = logging.getLogger(__name__)
+
+
+ETSI = ElementMaker(namespace=EtsiNS)
+DS = ElementMaker(namespace=DSigNs)
+
 
 class Policy(object):
     """"
@@ -135,22 +141,19 @@ class Policy(object):
         self.calculate_certificate(node, key_x509)
 
     def calculate_certificate(self, node, key_x509):
-        cert = create_node('Cert', node, EtsiNS)
-        cert_digest = create_node('CertDigest', cert, EtsiNS)
-        digest_algorithm = create_node('DigestMethod', cert_digest, DSigNs)
-        digest_algorithm.set('Algorithm', self.hash_method)
-        digest_value = create_node('DigestValue', cert_digest, DSigNs)
-        digest_value.text = b64encode(key_x509.fingerprint(
-            MAP_HASHLIB[self.hash_method]()
-        ))
-        issuer_serial = create_node('IssuerSerial', cert, EtsiNS)
-        create_node(
-            'X509IssuerName', issuer_serial, DSigNs
-        ).text = get_rdns_name(key_x509.issuer.rdns)
-        create_node(
-            'X509SerialNumber', issuer_serial, DSigNs
-        ).text = str(key_x509.serial_number)
-        return
+        fingerprint = key_x509.fingerprint(MAP_HASHLIB[self.hash_method]())
+        _ETSI_Cert = ETSI.Cert(
+            ETSI.CertDigest(
+                DS.DigestMethod(Algorithm=self.hash_method),
+                DS.DigestValue(b64encode(fingerprint).decode())
+            ),
+            ETSI.IssuerSerial(
+                DS.X509IssuerName(get_rdns_name(key_x509.issuer.rdns)),
+                DS.X509SerialNumber(str(key_x509.serial_number))
+            )
+
+        )
+        node.append(_ETSI_Cert)
 
     def validate_certificate(self, node, signature):
         certs = node.findall('etsi:Cert', namespaces=NS_MAP)
@@ -269,19 +272,25 @@ class GenericPolicyId(Policy):
         :param node: SignaturePolicyIdentifier node
         :return:
         """
-        signature_policy_id = create_node('SignaturePolicyId', node, EtsiNS)
-        sig_policy_id = create_node('SigPolicyId', signature_policy_id, EtsiNS)
-        create_node('Identifier', sig_policy_id, EtsiNS).text = self.identifier
-        create_node('Description', sig_policy_id, EtsiNS).text = self.name
         value = self._resolve_policy(self.identifier)
-        value = self.set_transforms(signature_policy_id, value, sign)
-        digest = create_node('SigPolicyHash', signature_policy_id, EtsiNS)
-        digest_method = create_node('DigestMethod', digest, DSigNs)
-        digest_method.set('Algorithm', self.hash_method)
-        digest_value = create_node('DigestValue', digest, DSigNs)
+        # Must be previously set in the template
+        # TODO: Implement a better version
+        transforms = node.find(
+            'etsi:SignaturePolicyId/ds:Transforms', namespaces=NS_MAP)
+        value = self.set_transforms(transforms, value, True)
         hash_calc = hashlib.new(TransformUsageDigestMethod[self.hash_method])
         hash_calc.update(value)
-        digest_value.text = b64encode(hash_calc.digest())
+        _ETSI_SignaturePolicyId = ETSI.SignaturePolicyId(
+            ETSI.SigPolicyId(
+                ETSI.Identifier(),
+                ETSI.Description()
+            ),
+            ETSI.SigPolicyHash(
+                DS.DigestMethod(Algorithm=self.hash_method),
+                DS.DigestValue(b64encode(hash_calc.digest()))
+            )
+        )
+        node.append(_ETSI_SignaturePolicyId)
 
     def validate_policy_node(self, node):
         """
