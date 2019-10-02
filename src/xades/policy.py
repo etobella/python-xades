@@ -35,6 +35,15 @@ class Policy(object):
     def name(self):
         raise Exception("Name is not defined")
 
+    def _resolve_policy(self, identifier):
+        """
+        Resolves the signature policy to bytes.
+        Override for resolving e.g. from a local cache
+        :param identifier: the value of <etsi:SigPolicyId/etsi:Identifier/>
+        :return: bytes
+        """
+        return urllib.urlopen(identifier).read()
+
     def sign(self, signature):
         return
 
@@ -80,15 +89,15 @@ class Policy(object):
         implied = node.find('etsi:SignaturePolicyImplied', namespaces=NS_MAP)
         if implied is not None:
             return
-        policy_id = node.find('etsi:SignaturePolicyId', namespaces=NS_MAP)
-        identifier = policy_id.find('etsi:SigPolicyId', namespaces=NS_MAP)
-        remote = identifier.find('etsi:Identifier', namespaces=NS_MAP).text
-        value = urllib.urlopen(remote).read()
-        value = self.set_transforms(policy_id, value, sign)
-        hash_method = policy_id.find(
+        signature_policy_id = node.find('etsi:SignaturePolicyId', namespaces=NS_MAP)
+        sig_policy_id = signature_policy_id.find('etsi:SigPolicyId', namespaces=NS_MAP)
+        identifier = sig_policy_id.find('etsi:Identifier', namespaces=NS_MAP).text
+        value = self._resolve_policy(identifier)
+        value = self.set_transforms(signature_policy_id, value, sign)
+        hash_method = signature_policy_id.find(
             'etsi:SigPolicyHash/ds:DigestMethod', namespaces=NS_MAP
         ).get('Algorithm')
-        digest_value = policy_id.find(
+        digest_value = signature_policy_id.find(
             'etsi:SigPolicyHash/ds:DigestValue', namespaces=NS_MAP
         )
         hash_calc = hashlib.new(TransformUsageDigestMethod[hash_method])
@@ -196,13 +205,13 @@ class PolicyId(Policy):
         """
         if not sign:
             return super(PolicyId, self).calculate_policy_node(node, sign)
-        policy_id = create_node('SignaturePolicyId', node, EtsiNS)
-        identifier = create_node('SigPolicyId', policy_id, EtsiNS)
-        create_node('Identifier', identifier, EtsiNS).text = self.identifier
-        create_node('Description', identifier, EtsiNS).text = self.name
-        value = urllib.urlopen(self.identifier).read()
-        value = self.set_transforms(policy_id, value, sign)
-        digest = create_node('SigPolicyHash', policy_id, EtsiNS)
+        signature_policy_id = create_node('SignaturePolicyId', node, EtsiNS)
+        sig_policy_id = create_node('SigPolicyId', signature_policy_id, EtsiNS)
+        create_node('Identifier', sig_policy_id, EtsiNS).text = self.identifier
+        create_node('Description', sig_policy_id, EtsiNS).text = self.name
+        value = self._resolve_policy(self.identifier)
+        value = self.set_transforms(signature_policy_id, value, sign)
+        digest = create_node('SigPolicyHash', signature_policy_id, EtsiNS)
         digest_method = create_node('DigestMethod', digest, DSigNs)
         digest_method.set('Algorithm', self.hash_method)
         digest_value = create_node('DigestValue', digest, DSigNs)
