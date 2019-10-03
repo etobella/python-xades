@@ -29,23 +29,25 @@ ETSI = ElementMaker(namespace=EtsiNS)
 DS = ElementMaker(namespace=DSigNs)
 
 
-class Policy(object):
+class BasePolicy(object):
     """"
-    Policy class created in order to define different policies
+    Policy base class created in order to define different policies.
+    A mixture of base class implementations, and abstract class
+    interface definitions. (TODO: might be separated in the future)
     """
     hash_method = None
 
     @property
     def identifier(self):
-        raise Exception("Id is not defined")
+        raise NotImplementedError("Implement on specific subclasses")
 
     @property
     def name(self):
-        raise Exception("Name is not defined")
+        raise NotImplementedError("Implement on specific subclasses")
 
     @property
     def policy(self):
-        raise Exception("Policy is not defined")
+        raise NotImplementedError("Implement on specific subclasses")
 
     def _resolve_policy(self, identifier):
         """
@@ -120,22 +122,12 @@ class Policy(object):
 
     def validate_policy_node(self, node):
         """
-        An unspecific validation implementation for a given
+        A validation implementation for a given
         <etsi:SignaturePolicyIdentifier/> node
         :param node: Policy node
         :return: bool
         """
-        implied = node.find('etsi:SignaturePolicyImplied', namespaces=NS_MAP)
-        if implied is not None:
-            return
-        data = self._query_signature_policy_identifer_data(node)
-        value = self._resolve_policy(data['Identifier'])
-        value = self.set_transforms(data['Transforms'], value, False)
-        hash_calc = hashlib.new(
-            TransformUsageDigestMethod[data['DigestMethodAlgorithm']])
-        hash_calc.update(value)
-        digest_val = hash_calc.digest()
-        assert data['DigestValue'] == b64encode(digest_val).decode()
+        raise NotImplementedError("Implement on specific subclasses")
 
     def calculate_certificates(self, node, key_x509):
         self.calculate_certificate(node, key_x509)
@@ -218,7 +210,7 @@ class Policy(object):
         return self.produce_policy_node(node)
 
 
-class ImpliedPolicy(Policy):
+class ImpliedPolicy(BasePolicy):
     def __init__(self, hash_method=TransformSha1):
         self.hash_method = hash_method
 
@@ -245,7 +237,7 @@ class ImpliedPolicy(Policy):
         return
 
 
-class GenericPolicyId(Policy):
+class GenericPolicyId(BasePolicy):
     def __init__(self, identifier, name, hash_method):
         self.generic_identifier = identifier
         self.generic_name = name
