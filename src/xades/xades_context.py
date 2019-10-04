@@ -121,16 +121,16 @@ class XAdESContext(SignatureContext):
             'etsi:SigningCertificate', namespaces=NS_MAP
         )
         assert certificate_list is not None
-        if sign:
-            self.policy.calculate_certificates(certificate_list, self.x509)
-        else:
-            self.policy.validate_certificate(certificate_list, node)
         policy = signature_properties.find(
             'etsi:SignaturePolicyIdentifier', namespaces=NS_MAP
         )
         if sign:
             assert policy is not None
-        self.policy.calculate_policy_node(policy, sign)
+            self.policy.calculate_certificates(certificate_list, self.x509)
+            self.policy.produce_policy_node(policy)
+        else:
+            self.policy.validate_certificate(certificate_list, node)
+            self.policy.validate_policy_node(policy)
 
     def calculate_data_object_properties(
             self, data_object_properties, node, sign=False):
