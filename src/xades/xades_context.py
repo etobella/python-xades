@@ -14,11 +14,14 @@ from .policy import ImpliedPolicy
 
 
 class XAdESContext(SignatureContext):
-    def __init__(self, policy=None):
+    def __init__(self, policy=None, certificates=False):
         """
         Declaration
         :param policy: Policy class
         :type policy: xades.Policy
+        :param certificates: List of certificates
+        :type certificates: list<
+            cryptography.hazmat.backends.openssl.x509._Certificate>
         """
         self.policy = policy
         self.policies = {None: ImpliedPolicy()}
@@ -26,6 +29,7 @@ class XAdESContext(SignatureContext):
             self.policy = ImpliedPolicy()
         else:
             self.policies[policy.identifier] = policy
+        self.certificates = certificates
         super(XAdESContext, self).__init__()
 
     def sign(self, node):
@@ -126,7 +130,9 @@ class XAdESContext(SignatureContext):
         )
         if sign:
             assert policy is not None
-            self.policy.calculate_certificates(certificate_list, self.x509)
+            self.policy.calculate_certificates(
+                certificate_list, self.certificates or [self.x509]
+            )
             self.policy.produce_policy_node(policy)
         else:
             self.policy.validate_certificate(certificate_list, node)

@@ -129,8 +129,9 @@ class BasePolicy(object):
         """
         raise NotImplementedError("Implement on specific subclasses")
 
-    def calculate_certificates(self, node, key_x509):
-        self.calculate_certificate(node, key_x509)
+    def calculate_certificates(self, node, keys_x509):
+        for key_x509 in keys_x509:
+            self.calculate_certificate(node, key_x509)
 
     def calculate_certificate(self, node, key_x509):
         fingerprint = key_x509.fingerprint(MAP_HASHLIB[self.hash_method]())
