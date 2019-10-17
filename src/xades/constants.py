@@ -3,13 +3,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from cryptography.hazmat.primitives import hashes
-
 from xmlsig import constants
+
 from .ns import EtsiNS
 
-ID_ATTR = 'Id'
+ID_ATTR = "Id"
 NS_MAP = constants.NS_MAP
-NS_MAP['etsi'] = EtsiNS
+NS_MAP["etsi"] = EtsiNS
 
 MAP_HASHLIB = {
     constants.TransformMd5: hashes.MD5,

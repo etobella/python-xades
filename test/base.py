@@ -1,5 +1,6 @@
-from lxml import etree
 from os import path
+
+from lxml import etree
 
 BASE_DIR = path.dirname(__file__)
 
