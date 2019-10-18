@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from uuid import uuid4
+
 from .constants import ID_ATTR
 
 
@@ -17,11 +18,11 @@ def dict_compare(d1, d2):
 
 
 def rdns_to_map(data):
-    return {x.split('=')[0]: x.split('=')[1] for x in data.split(',') if x}
+    return {x.split("=")[0]: x.split("=")[1] for x in data.split(",") if x}
 
 
 def get_unique_id():
-    return 'id-{0}'.format(uuid4())
+    return "id-{}".format(uuid4())
 
 
 def ensure_id(node):

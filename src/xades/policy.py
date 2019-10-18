@@ -9,13 +9,12 @@ from base64 import b64decode, b64encode
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509 import load_der_x509_certificate
 from lxml.builder import ElementMaker
-
-from xades.constants import NS_MAP, MAP_HASHLIB
+from xades.constants import MAP_HASHLIB, NS_MAP
 from xades.ns import EtsiNS
-from xades.utils import rdns_to_map, dict_compare
-from xmlsig.constants import TransformUsageDigestMethod, TransformSha1
+from xades.utils import dict_compare, rdns_to_map
+from xmlsig.constants import TransformSha1, TransformUsageDigestMethod
 from xmlsig.ns import DSigNs
-from xmlsig.utils import create_node, USING_PYTHON2, get_rdns_name
+from xmlsig.utils import USING_PYTHON2, create_node, get_rdns_name
 
 if USING_PYTHON2:
     import urllib
@@ -35,6 +34,7 @@ class BasePolicy(object):
     A mixture of base class implementations, and abstract class
     interface definitions. (TODO: might be separated in the future)
     """
+
     hash_method = None
 
     @property
@@ -65,32 +65,34 @@ class BasePolicy(object):
         """
         Finds if the policy is the same and then applies the policy validation.
         Otherwise, it does nothing
-        :param signature: Signature node 
-        :return: 
+        :param signature: Signature node
+        :return:
         """
         policy = signature.find(
-            'ds:Object/etsi:QualifyingProperties/etsi:SignedProperties/'
-            'etsi:SignedSignatureProperties/etsi:SignaturePolicyIdentifier/'
-            'etsi:SignaturePolicyId',
-            namespaces=NS_MAP)
+            "ds:Object/etsi:QualifyingProperties/etsi:SignedProperties/"
+            "etsi:SignedSignatureProperties/etsi:SignaturePolicyIdentifier/"
+            "etsi:SignaturePolicyId",
+            namespaces=NS_MAP,
+        )
         if policy is None:
             return
         if self.identifier != policy.find(
-                'etsi:SigPolicyId/etsi:Identifier', namespaces=NS_MAP):
+            "etsi:SigPolicyId/etsi:Identifier", namespaces=NS_MAP
+        ):
             return
         self.validate_policy(signature)
 
     def validate_policy(self, signature):
         """
         Policy validation
-        :param signature: signature node 
+        :param signature: signature node
         :return: None
         """
         return
 
     def set_transforms(self, transforms, value, sign=False):
         """
-        Creates transformations of the policy if required. Modifies node and 
+        Creates transformations of the policy if required. Modifies node and
         returns the transformed value
         :param node: Policy node
         :param value: Original value
@@ -103,21 +105,21 @@ class BasePolicy(object):
         """
         Query common policy validation data.
         """
-        signature_policy_id = node.find('etsi:SignaturePolicyId', namespaces=NS_MAP)
-        sig_policy_id = signature_policy_id.find('etsi:SigPolicyId', namespaces=NS_MAP)
-        identifier = sig_policy_id.find('etsi:Identifier', namespaces=NS_MAP).text
+        signature_policy_id = node.find("etsi:SignaturePolicyId", namespaces=NS_MAP)
+        sig_policy_id = signature_policy_id.find("etsi:SigPolicyId", namespaces=NS_MAP)
+        identifier = sig_policy_id.find("etsi:Identifier", namespaces=NS_MAP).text
         hash_method = signature_policy_id.find(
-            'etsi:SigPolicyHash/ds:DigestMethod', namespaces=NS_MAP
-        ).get('Algorithm')
+            "etsi:SigPolicyHash/ds:DigestMethod", namespaces=NS_MAP
+        ).get("Algorithm")
         digest_value = signature_policy_id.find(
-            'etsi:SigPolicyHash/ds:DigestValue', namespaces=NS_MAP
+            "etsi:SigPolicyHash/ds:DigestValue", namespaces=NS_MAP
         ).text
-        transforms = signature_policy_id.find('ds:Tranforms', namespaces=NS_MAP)
+        transforms = signature_policy_id.find("ds:Tranforms", namespaces=NS_MAP)
         return {
             "Identifier": identifier,
             "DigestMethodAlgorithm": hash_method,
             "DigestValue": digest_value,
-            "Transforms": transforms
+            "Transforms": transforms,
         }
 
     def validate_policy_node(self, node):
@@ -138,37 +140,35 @@ class BasePolicy(object):
         _ETSI_Cert = ETSI.Cert(
             ETSI.CertDigest(
                 DS.DigestMethod(Algorithm=self.hash_method),
-                DS.DigestValue(b64encode(fingerprint).decode())
+                DS.DigestValue(b64encode(fingerprint).decode()),
             ),
             ETSI.IssuerSerial(
                 DS.X509IssuerName(get_rdns_name(key_x509.issuer.rdns)),
-                DS.X509SerialNumber(str(key_x509.serial_number))
-            )
-
+                DS.X509SerialNumber(str(key_x509.serial_number)),
+            ),
         )
         node.append(_ETSI_Cert)
 
     def validate_certificate(self, node, signature):
-        certs = node.findall('etsi:Cert', namespaces=NS_MAP)
-        x509 = signature.find('ds:KeyInfo/ds:X509Data', namespaces=NS_MAP)
-        x509_data = x509.find('ds:X509Certificate', namespaces=NS_MAP)
-        serial = x509.find('ds:X509IssuerSerial', namespaces=NS_MAP)
+        certs = node.findall("etsi:Cert", namespaces=NS_MAP)
+        x509 = signature.find("ds:KeyInfo/ds:X509Data", namespaces=NS_MAP)
+        x509_data = x509.find("ds:X509Certificate", namespaces=NS_MAP)
+        serial = x509.find("ds:X509IssuerSerial", namespaces=NS_MAP)
         if serial is not None:
-            serial_name = serial.find(
-                'ds:X509IssuerName', namespaces=NS_MAP
-            ).text
-            serial_number = serial.find(
-                'ds:X509SerialNumber', namespaces=NS_MAP
-            ).text
+            serial_name = serial.find("ds:X509IssuerName", namespaces=NS_MAP).text
+            serial_number = serial.find("ds:X509SerialNumber", namespaces=NS_MAP).text
             certificate = None
             for cert in certs:
-                if cert.find(
-                        'etsi:IssuerSerial/ds:X509IssuerName',
-                        namespaces=NS_MAP
-                ).text == serial_name and cert.find(
-                    'etsi:IssuerSerial/ds:X509SerialNumber',
-                    namespaces=NS_MAP
-                ).text == serial_number:
+                if (
+                    cert.find(
+                        "etsi:IssuerSerial/ds:X509IssuerName", namespaces=NS_MAP
+                    ).text
+                    == serial_name
+                    and cert.find(
+                        "etsi:IssuerSerial/ds:X509SerialNumber", namespaces=NS_MAP
+                    ).text
+                    == serial_number
+                ):
                     certificate = cert
             assert certificate is not None
         else:
@@ -177,24 +177,33 @@ class BasePolicy(object):
             parsed_x509 = load_der_x509_certificate(
                 b64decode(x509_data.text), default_backend()
             )
-            assert str(parsed_x509.serial_number) == certificate.find(
-                'etsi:IssuerSerial/ds:X509SerialNumber', namespaces=NS_MAP
-            ).text
+            assert (
+                str(parsed_x509.serial_number)
+                == certificate.find(
+                    "etsi:IssuerSerial/ds:X509SerialNumber", namespaces=NS_MAP
+                ).text
+            )
             dict_compare(
                 rdns_to_map(get_rdns_name(parsed_x509.issuer.rdns)),
-                rdns_to_map(certificate.find(
-                    'etsi:IssuerSerial/ds:X509IssuerName',
-                    namespaces=NS_MAP
-                ).text)
+                rdns_to_map(
+                    certificate.find(
+                        "etsi:IssuerSerial/ds:X509IssuerName", namespaces=NS_MAP
+                    ).text
+                ),
             )
-            digest = certificate.find(
-                'etsi:CertDigest', namespaces=NS_MAP
+            digest = certificate.find("etsi:CertDigest", namespaces=NS_MAP)
+            assert (
+                b64encode(
+                    parsed_x509.fingerprint(
+                        MAP_HASHLIB[
+                            digest.find("ds:DigestMethod", namespaces=NS_MAP).get(
+                                "Algorithm"
+                            )
+                        ]()
+                    )
+                ).decode()
+                == digest.find("ds:DigestValue", namespaces=NS_MAP).text
             )
-            assert b64encode(
-                parsed_x509.fingerprint(MAP_HASHLIB[digest.find(
-                    'ds:DigestMethod', namespaces=NS_MAP
-                ).get('Algorithm')]())).decode() == digest.find(
-                'ds:DigestValue', namespaces=NS_MAP).text
 
     def calculate_policy_node(self, node, sign=False):
         """
@@ -205,7 +214,8 @@ class BasePolicy(object):
         """
         logger.warning(
             "This method is deprecated. Use `produce_policy_node` "
-            "or `validate_policy_node` accordingly.")
+            "or `validate_policy_node` accordingly."
+        )
         if not sign:
             return self.validate_policy_node(node)
         return self.produce_policy_node(node)
@@ -225,7 +235,7 @@ class ImpliedPolicy(BasePolicy):
         :param node: SignaturePolicyIdentifier node
         :return:
         """
-        create_node('SignaturePolicyImplied', node, EtsiNS)
+        create_node("SignaturePolicyImplied", node, EtsiNS)
 
     def validate_policy_node(self, node):
         """
@@ -269,19 +279,17 @@ class GenericPolicyId(BasePolicy):
         # Must be previously set in the template
         # TODO: Implement a better version
         transforms = node.find(
-            'etsi:SignaturePolicyId/ds:Transforms', namespaces=NS_MAP)
+            "etsi:SignaturePolicyId/ds:Transforms", namespaces=NS_MAP
+        )
         value = self.set_transforms(transforms, value, True)
         hash_calc = hashlib.new(TransformUsageDigestMethod[self.hash_method])
         hash_calc.update(value)
         _ETSI_SignaturePolicyId = ETSI.SignaturePolicyId(
-            ETSI.SigPolicyId(
-                ETSI.Identifier(),
-                ETSI.Description()
-            ),
+            ETSI.SigPolicyId(ETSI.Identifier(), ETSI.Description()),
             ETSI.SigPolicyHash(
                 DS.DigestMethod(Algorithm=self.hash_method),
-                DS.DigestValue(b64encode(hash_calc.digest()).decode())
-            )
+                DS.DigestValue(b64encode(hash_calc.digest()).decode()),
+            ),
         )
         node.append(_ETSI_SignaturePolicyId)
 
@@ -292,13 +300,14 @@ class GenericPolicyId(BasePolicy):
         :param node: Policy node
         :return: bool
         """
-        implied = node.find('etsi:SignaturePolicyImplied', namespaces=NS_MAP)
+        implied = node.find("etsi:SignaturePolicyImplied", namespaces=NS_MAP)
         if implied is not None:
             return
         data = self._query_signature_policy_identifer_data(node)
         value = self.policy
-        value = self.set_transforms(data['Transforms'], value, False)
+        value = self.set_transforms(data["Transforms"], value, False)
         hash_calc = hashlib.new(
-            TransformUsageDigestMethod[data['DigestMethodAlgorithm']])
+            TransformUsageDigestMethod[data["DigestMethodAlgorithm"]]
+        )
         hash_calc.update(value)
-        assert data['DigestValue'] == b64encode(hash_calc.digest()).decode()
+        assert data["DigestValue"] == b64encode(hash_calc.digest()).decode()
