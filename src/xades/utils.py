@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # © 2017 Creu Blanca
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
@@ -18,7 +17,9 @@ def dict_compare(d1, d2):
 
 
 def rdns_to_map(data):
-    return {x.split("=")[0]: x.split("=")[1] for x in data.split(",") if x}
+    return {
+        x.split("=")[0].strip(): x.split("=")[1].strip() for x in data.split(",") if x
+    }
 
 
 def get_unique_id():

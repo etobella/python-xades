@@ -3,8 +3,8 @@ from datetime import datetime
 from os import path
 
 import xmlsig
+from cryptography.hazmat.primitives.serialization import pkcs12
 from mock import patch
-from OpenSSL import crypto
 from xades import ObjectIdentifier, XAdESContext, template, utils
 from xades.policy import GenericPolicyId, ImpliedPolicy
 
@@ -42,7 +42,7 @@ class TestXadesSignature(unittest.TestCase):
         )
         ctx = XAdESContext(policy)
         with open(path.join(BASE_DIR, "data/keyStore.p12"), "rb") as key_file:
-            ctx.load_pkcs12(crypto.load_pkcs12(key_file.read()))
+            ctx.load_pkcs12(pkcs12.load_key_and_certificates(key_file.read(), None))
         with patch("xades.policy.urllib.urlopen") as mock:
             mock.return_value = UrllibMock()
             ctx.sign(sign)
@@ -91,16 +91,10 @@ class TestXadesSignature(unittest.TestCase):
         )
         root.append(signature)
         with open(path.join(BASE_DIR, "data/keyStore.p12"), "rb") as key_file:
-            certificate = crypto.load_pkcs12(key_file.read())
+            certificate = pkcs12.load_key_and_certificates(key_file.read(), None)
         with open(path.join(BASE_DIR, "data/keyStore2.p12"), "rb") as key_file:
-            certificate2 = crypto.load_pkcs12(key_file.read())
-        ctx = XAdESContext(
-            policy,
-            [
-                certificate2.get_certificate().to_cryptography(),
-                certificate.get_certificate().to_cryptography(),
-            ],
-        )
+            certificate2 = pkcs12.load_key_and_certificates(key_file.read(), None)
+        ctx = XAdESContext(policy, [certificate2[1], certificate[1]])
         ctx.load_pkcs12(certificate)
         with patch("xades.policy.urllib.urlopen") as mock:
             mock.return_value = UrllibMock()
@@ -158,7 +152,7 @@ class TestXadesSignature(unittest.TestCase):
         root.append(signature)
         ctx = XAdESContext(ImpliedPolicy(xmlsig.constants.TransformSha1))
         with open(path.join(BASE_DIR, "data/keyStore.p12"), "rb") as key_file:
-            ctx.load_pkcs12(crypto.load_pkcs12(key_file.read()))
+            ctx.load_pkcs12(pkcs12.load_key_and_certificates(key_file.read(), None))
         with patch("xades.policy.urllib.urlopen") as mock:
             mock.return_value = UrllibMock()
             ctx.sign(signature)
