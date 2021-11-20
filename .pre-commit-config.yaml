@@ -10,7 +10,7 @@ repos:
 - hooks:
   - {id: black, language_version: python3.7}
   repo: https://github.com/ambv/black
-  rev: 19.3b0
+  rev: 18.9b0
 - hooks:
   - {id: trailing-whitespace, language_version: python3.7}
   - {id: end-of-file-fixer, language_version: python3.7}

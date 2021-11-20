@@ -20,7 +20,7 @@ tests_require = [
 
 setup(
     name="xades",
-    version="0.2.1",
+    version="0.2.2",
     description="XaDES XML signature",
     long_description="XaDES XML Signature created with cryptography and lxml",
     author="Enric Tobella Alomar",
@@ -33,10 +33,10 @@ setup(
     package_dir={"": "src"},
     packages=find_packages("src"),
     include_package_data=True,
-    license="BSD",
+    license="AGPL-3",
     classifiers=[
         "Development Status :: 4 - Beta",
-        "License :: OSI Approved :: BSD License",
+        "GNU Affero General Public License v3 or later (AGPLv3+)",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
