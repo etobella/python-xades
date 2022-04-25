@@ -284,7 +284,7 @@ class GenericPolicyId(BasePolicy):
         hash_calc = hashlib.new(TransformUsageDigestMethod[self.hash_method])
         hash_calc.update(value)
         _ETSI_SignaturePolicyId = ETSI.SignaturePolicyId(
-            ETSI.SigPolicyId(ETSI.Identifier(), ETSI.Description()),
+            ETSI.SigPolicyId(ETSI.Identifier(self.identifier), ETSI.Description(self.name)),
             ETSI.SigPolicyHash(
                 DS.DigestMethod(Algorithm=self.hash_method),
                 DS.DigestValue(b64encode(hash_calc.digest()).decode()),
