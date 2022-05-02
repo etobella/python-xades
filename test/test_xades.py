@@ -37,7 +37,7 @@ class TestXadesSignature(unittest.TestCase):
         policy = GenericPolicyId(
             "http://www.facturae.es/politica_de_firma_formato_facturae/"
             "politica_de_firma_formato_facturae_v3_1.pdf",
-            u"Politica de Firma FacturaE v3.1",
+            "Politica de Firma FacturaE v3.1",
             xmlsig.constants.TransformSha1,
         )
         ctx = XAdESContext(policy)
@@ -86,7 +86,7 @@ class TestXadesSignature(unittest.TestCase):
         policy = GenericPolicyId(
             "http://www.facturae.es/politica_de_firma_formato_facturae/"
             "politica_de_firma_formato_facturae_v3_1.pdf",
-            u"Politica de Firma FacturaE v3.1",
+            "Politica de Firma FacturaE v3.1",
             xmlsig.constants.TransformSha1,
         )
         root.append(signature)

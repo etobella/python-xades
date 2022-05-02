@@ -144,10 +144,10 @@ class XAdESContext(SignatureContext):
 
     def calculate_unsigned_properties(self, unsigned_properties, node, sign=False):
         """
-                To be improved with EPES, T...
-                :param unsigned_properties: UnsignedProperties node
-                :param node: Signature node
-                :param sign:
-                :return:
-                """
+        To be improved with EPES, T...
+        :param unsigned_properties: UnsignedProperties node
+        :param node: Signature node
+        :param sign:
+        :return:
+        """
         return
