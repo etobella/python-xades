@@ -9,7 +9,7 @@ test_requires = ["xmlsig[test]"]
 
 setup(
     name="xades",
-    version="0.2.2",
+    version="0.2.3",
     description="XaDES XML signature",
     long_description="XaDES XML Signature created with cryptography and lxml",
     author="Enric Tobella Alomar",
