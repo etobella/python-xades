@@ -1,16 +1,10 @@
-import pathlib
-
-from pkg_resources import parse_requirements
 from setuptools import find_packages, setup
 
-with pathlib.Path("requirements.txt").open() as requirements_txt:
-    install_requires = [
-        str(requirement) for requirement in parse_requirements(requirements_txt)
-    ]
-with pathlib.Path("test-requirements.txt").open() as requirements_txt:
-    test_requires = [
-        str(requirement) for requirement in parse_requirements(requirements_txt)
-    ]
+install_requires = [
+    "xmlsig",
+    "pytz",
+]
+test_requires = ["xmlsig[test]"]
 
 
 setup(
