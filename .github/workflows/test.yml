@@ -10,14 +10,31 @@ on:
 
 jobs:
     test:
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                PYTHON_VERSION: ["3.6", "3.7", "3.8", "3.9"]
-                LXML_VERSION: ["4.3.0", "4.6.4"]
-                exclude:
-                    - PYTHON_VERSION: "3.9"
+                include:
+                    - PYTHON_VERSION: "3.6"
                       LXML_VERSION: "4.3.0"
+                      os: ubuntu-20.04
+                    - PYTHON_VERSION: "3.6"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-20.04
+                    - PYTHON_VERSION: "3.7"
+                      LXML_VERSION: "4.3.0"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.7"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.8"
+                      LXML_VERSION: "4.3.0"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.8"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-latest
+                    - PYTHON_VERSION: "3.9"
+                      LXML_VERSION: "4.6.4"
+                      os: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
             - name: Set up Python

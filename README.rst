@@ -63,7 +63,7 @@ More functionalities are still on work.
 License
 =======
 
-This library is published under AGPL-3 license.
+This library is published under LGPL-3 license.
 
 Contributors
 ============
